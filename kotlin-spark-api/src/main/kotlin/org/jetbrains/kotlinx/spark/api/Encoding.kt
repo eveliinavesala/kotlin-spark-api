@@ -49,6 +49,11 @@ import org.apache.spark.sql.types.UserDefinedType
 import org.apache.spark.unsafe.types.CalendarInterval
 import org.jetbrains.kotlinx.spark.api.plugin.annotations.ColumnName
 import org.jetbrains.kotlinx.spark.api.plugin.annotations.Sparkify
+import org.jetbrains.kotlinx.spark.api.udts.DatePeriodUdt
+import org.jetbrains.kotlinx.spark.api.udts.DateTimePeriodUdt
+import org.jetbrains.kotlinx.spark.api.udts.InstantUdt
+import org.jetbrains.kotlinx.spark.api.udts.LocalDateTimeUdt
+import org.jetbrains.kotlinx.spark.api.udts.LocalDateUdt
 import scala.reflect.ClassTag
 import java.io.Serializable
 import java.util.*
@@ -170,12 +175,14 @@ object KotlinTypeInference : Serializable {
      * @return an [AgnosticEncoder] for the given [kType].
      */
     @Suppress("UNCHECKED_CAST")
-    fun <T> encoderFor(kType: KType): AgnosticEncoder<T> =
-        encoderFor(
+    fun <T> encoderFor(kType: KType): AgnosticEncoder<T> {
+        registerUdts()
+        return encoderFor(
             currentType = kType,
             seenTypeSet = emptySet(),
             typeVariables = emptyMap(),
         ) as AgnosticEncoder<T>
+    }
 
 
     private inline fun <reified T> KType.isSubtypeOf(): Boolean = isSubtypeOf(typeOf<T>())
@@ -296,6 +303,16 @@ object KotlinTypeInference : Serializable {
     private fun <K, V> transitiveMerge(a: Map<K, V>, b: Map<K, V>, valueToKey: (V) -> K?): Map<K, V> =
         a + b.mapValues { a.getOrDefault(valueToKey(it.value), it.value) }
 
+    private fun registerUdts() {
+        UDTRegistration.register(kotlinx.datetime.LocalDate::class.java.name, LocalDateUdt::class.java.name)
+        UDTRegistration.register(kotlinx.datetime.Instant::class.java.name, InstantUdt::class.java.name)
+        UDTRegistration.register(kotlinx.datetime.LocalDateTime::class.java.name, LocalDateTimeUdt::class.java.name)
+        UDTRegistration.register(kotlinx.datetime.DatePeriod::class.java.name, DatePeriodUdt::class.java.name)
+        UDTRegistration.register(kotlinx.datetime.DateTimePeriod::class.java.name, DateTimePeriodUdt::class.java.name)
+        // TODO
+        //  UDTRegistration.register(kotlin.time.Duration::class.java.name, DurationUdt::class.java.name)
+    }
+
     /**
      *
      */
@@ -375,19 +392,12 @@ object KotlinTypeInference : Serializable {
             currentType.isSubtypeOf<java.math.BigInteger?>() -> AgnosticEncoders.`JavaBigIntEncoder$`.`MODULE$`
             currentType.isSubtypeOf<CalendarInterval?>() -> AgnosticEncoders.`CalendarIntervalEncoder$`.`MODULE$`
             currentType.isSubtypeOf<java.time.LocalDate?>() -> AgnosticEncoders.STRICT_LOCAL_DATE_ENCODER()
-            currentType.isSubtypeOf<kotlinx.datetime.LocalDate?>() -> TODO("User java.time.LocalDate for now. We'll create a UDT for this.")
             currentType.isSubtypeOf<java.sql.Date?>() -> AgnosticEncoders.STRICT_DATE_ENCODER()
             currentType.isSubtypeOf<java.time.Instant?>() -> AgnosticEncoders.STRICT_INSTANT_ENCODER()
-            currentType.isSubtypeOf<kotlinx.datetime.Instant?>() -> TODO("Use java.time.Instant for now. We'll create a UDT for this.")
-            currentType.isSubtypeOf<kotlin.time.TimeMark?>() -> TODO("Use java.time.Instant for now. We'll create a UDT for this.")
             currentType.isSubtypeOf<java.sql.Timestamp?>() -> AgnosticEncoders.STRICT_TIMESTAMP_ENCODER()
             currentType.isSubtypeOf<java.time.LocalDateTime?>() -> AgnosticEncoders.`LocalDateTimeEncoder$`.`MODULE$`
-            currentType.isSubtypeOf<kotlinx.datetime.LocalDateTime?>() -> TODO("Use java.time.LocalDateTime for now. We'll create a UDT for this.")
             currentType.isSubtypeOf<java.time.Duration?>() -> AgnosticEncoders.`DayTimeIntervalEncoder$`.`MODULE$`
-            currentType.isSubtypeOf<kotlin.time.Duration?>() -> TODO("Use java.time.Duration for now. We'll create a UDT for this.")
             currentType.isSubtypeOf<java.time.Period?>() -> AgnosticEncoders.`YearMonthIntervalEncoder$`.`MODULE$`
-            currentType.isSubtypeOf<kotlinx.datetime.DateTimePeriod?>() -> TODO("Use java.time.Period for now. We'll create a UDT for this.")
-            currentType.isSubtypeOf<kotlinx.datetime.DatePeriod?>() -> TODO("Use java.time.Period for now. We'll create a UDT for this.")
             currentType.isSubtypeOf<Row?>() -> AgnosticEncoders.`UnboundRowEncoder$`.`MODULE$`
 
             // enums
@@ -413,6 +423,8 @@ object KotlinTypeInference : Serializable {
 
                 AgnosticEncoders.UDTEncoder(udt, udt.javaClass)
             }
+
+            currentType.isSubtypeOf<kotlin.time.Duration?>() -> TODO("kotlin.time.Duration is unsupported. Use java.time.Duration for now.")
 
             currentType.isSubtypeOf<scala.Option<*>?>() -> {
                 val elementEncoder = encoderFor(
@@ -666,8 +678,6 @@ object KotlinTypeInference : Serializable {
                     fields.asScalaSeq(),
                 )
             }
-
-//            else -> throw IllegalArgumentException("No encoder found for type $currentType")
         }
     }
 

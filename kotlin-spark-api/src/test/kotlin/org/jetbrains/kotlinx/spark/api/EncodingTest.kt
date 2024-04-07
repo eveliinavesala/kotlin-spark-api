@@ -25,6 +25,11 @@ import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
+import kotlinx.datetime.DateTimePeriod
+import kotlinx.datetime.toKotlinDatePeriod
+import kotlinx.datetime.toKotlinInstant
+import kotlinx.datetime.toKotlinLocalDate
+import kotlinx.datetime.toKotlinLocalDateTime
 import org.apache.spark.sql.Dataset
 import org.apache.spark.sql.types.Decimal
 import org.apache.spark.unsafe.types.CalendarInterval
@@ -37,7 +42,12 @@ import java.sql.Timestamp
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.Period
+import kotlin.time.TimeMark
+import kotlin.time.TimeSource
+import kotlin.time.TimeSource.Monotonic
+import kotlin.time.toKotlinDuration
 
 class EncodingTest : ShouldSpec({
 
@@ -53,9 +63,25 @@ class EncodingTest : ShouldSpec({
                 dataset.collectAsList() shouldBe dates
             }
 
+            should("handle Kotlinx LocalDate Datasets") {
+                val dates = listOf(LocalDate.now().toKotlinLocalDate(), LocalDate.now().toKotlinLocalDate())
+                val dataset = dates.toDS()
+                dataset.collectAsList() shouldBe dates
+            }
+
             should("handle Instant Datasets") {
                 val instants = listOf(Instant.now(), Instant.now())
                 val dataset: Dataset<Instant> = instants.toDS()
+                dataset.collectAsList().let { (first, second) ->
+                    val (a, b) = instants
+                    a.compareTo(first) shouldBe 0
+                    b.compareTo(second) shouldBe 0
+                }
+            }
+
+            should("handle Kotlinx Instant Datasets") {
+                val instants = listOf(Instant.now().toKotlinInstant(), Instant.now().toKotlinInstant())
+                val dataset = instants.toDS()
                 dataset.collectAsList().let { (first, second) ->
                     val (a, b) = instants
                     a.compareTo(first) shouldBe 0
@@ -69,10 +95,27 @@ class EncodingTest : ShouldSpec({
                 dataset.collectAsList() shouldBe timeStamps
             }
 
+            should("handle LocalDateTime") {
+                val timeStamps = listOf(LocalDateTime.now(), LocalDateTime.now().plusDays(3))
+                val dataset = timeStamps.toDS()
+                dataset.collectAsList() shouldBe timeStamps
+            }
+
+            should("handle Kotlinx LocalDateTime") {
+                val timeStamps = listOf(LocalDateTime.now().toKotlinLocalDateTime(), LocalDateTime.now().plusDays(3).toKotlinLocalDateTime())
+                val dataset = timeStamps.toDS()
+                dataset.collectAsList() shouldBe timeStamps
+            }
+
             //#if sparkMinor >= 3.2
             should("handle Duration Datasets") {
                 val dataset = dsOf(Duration.ZERO)
                 dataset.collectAsList() shouldBe listOf(Duration.ZERO)
+            }
+
+            xshould("handle Kotlin Duration Datasets") {
+                val dataset = dsOf(Duration.ZERO.toKotlinDuration())
+                dataset.collectAsList() shouldBe listOf(Duration.ZERO.toKotlinDuration())
             }
             //#endif
 
@@ -91,6 +134,33 @@ class EncodingTest : ShouldSpec({
                 }
             }
             //#endif
+
+            should("handle Kotlinx DateTimePeriod Datasets") {
+                val periods = listOf(DateTimePeriod(years = 1), DateTimePeriod(hours = 2))
+                val dataset = periods.toDS()
+
+                dataset.show(false)
+
+                dataset.collectAsList().let {
+                    it[0] shouldBe DateTimePeriod(years = 1)
+                    // NOTE Spark truncates java.time.Period to months.
+                    it[1] shouldBe DateTimePeriod(hours = 2)
+                }
+            }
+
+            should("handle Kotlinx DatePeriod Datasets") {
+                val periods = listOf(Period.ZERO.toKotlinDatePeriod(), Period.ofDays(2).toKotlinDatePeriod())
+                val dataset = periods.toDS()
+
+                dataset.show(false)
+
+                dataset.collectAsList().let {
+                    it[0] shouldBe Period.ZERO.toKotlinDatePeriod()
+
+                    // NOTE Spark truncates java.time.Period to months.
+                    it[1] shouldBe Period.ofDays(0).toKotlinDatePeriod()
+                }
+            }
 
             should("handle binary datasets") {
                 val byteArray = "Hello there".encodeToByteArray()
