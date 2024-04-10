@@ -240,19 +240,23 @@ abstract class Integration(private val notebook: Notebook, private val options: 
 
     private fun renderDataset(it: Dataset<*>): MimeTypedResult =
         with(properties) {
-            val showFunction = Dataset::class
-                .memberFunctions
-                .firstOrNull { it.name == "showString" && it.valueParameters.size == 3 }
+//            val showFunction = Dataset::class
+//                .memberFunctions
+//                .firstOrNull { it.name == "showString" && it.valueParameters.size == 3 }
+//
+//            textResult(
+//                if (showFunction != null) {
+//                    showFunction.call(it, displayLimit, displayTruncate, false) as String
+//                } else {
+//                    // if the function cannot be called, make sure it will call println instead
+//                    it.show(displayLimit, displayTruncate)
+//                    ""
+//                }
+//            )
 
-            textResult(
-                if (showFunction != null) {
-                    showFunction.call(it, displayLimit, displayTruncate, false) as String
-                } else {
-                    // if the function cannot be called, make sure it will call println instead
-                    it.show(displayLimit, displayTruncate)
-                    ""
-                }
-            )
+            // don't actually render, instead use `show()`, which calls System.out
+            it.show(displayLimit, displayTruncate)
+            textResult("")
         }
 
 
