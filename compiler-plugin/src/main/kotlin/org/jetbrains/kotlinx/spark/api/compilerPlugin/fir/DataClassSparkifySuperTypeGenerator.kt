@@ -33,10 +33,10 @@ class DataClassSparkifySuperTypeGenerator(
         }
     }
 
-    context(TypeResolveServiceContainer)
     override fun computeAdditionalSupertypes(
         classLikeDeclaration: FirClassLikeDeclaration,
-        resolvedSupertypes: List<FirResolvedTypeRef>
+        resolvedSupertypes: List<FirResolvedTypeRef>,
+        typeResolver: TypeResolveService,
     ): List<FirResolvedTypeRef> = listOf(
         buildResolvedTypeRef {
             val scalaProduct = productFqNames.first().let {
@@ -48,7 +48,6 @@ class DataClassSparkifySuperTypeGenerator(
                 isNullable = false,
             )
         }
-
     )
 
     override fun needTransformSupertypes(declaration: FirClassLikeDeclaration): Boolean =

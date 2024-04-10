@@ -3,7 +3,13 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     // Needs to be installed in the local maven repository or have the bootstrap jar on the classpath
     id("org.jetbrains.kotlinx.spark.api")
+    java
     kotlin("jvm")
+    kotlin("plugin.noarg") version Versions.kotlin
+}
+
+noArg {
+    annotation("org.jetbrains.kotlinx.spark.examples.NoArg")
 }
 
 kotlinSparkApi {
