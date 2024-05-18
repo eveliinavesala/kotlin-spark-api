@@ -1,6 +1,8 @@
 package org.jetbrains.kotlinx.spark.api
 
 import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.core.spec.style.Test
+import io.kotest.core.test.TestScope
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.shouldBe
 import org.apache.spark.api.java.JavaRDD
@@ -8,7 +10,7 @@ import org.jetbrains.kotlinx.spark.api.tuples.*
 import scala.Tuple2
 import java.io.Serializable
 
-class RddTest : Serializable, ShouldSpec({
+class RddTest : ShouldSpec({
     context("RDD extension functions") {
 
         withSpark(
@@ -74,6 +76,7 @@ class RddTest : Serializable, ShouldSpec({
                     rdd.min() shouldBe 1.0
                 }
 
+                // TODO Does not work from testing environment
                 xcontext("Work with any number") {
 
                     should("Work with Bytes") {
@@ -108,7 +111,7 @@ class RddTest : Serializable, ShouldSpec({
 
                     should("Work with Doubles") {
                         val data = listOf(1, 1, 2, 2, 2, 3).map(Int::toDouble)
-                        val rdd = data.toRDD().toJavaDoubleRDD()
+                        val rdd = data.toRDD()
                         rdd.sum() shouldBe data.sum().toDouble()
                     }
                 }
