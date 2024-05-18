@@ -2,7 +2,7 @@ object Versions : Dsl<Versions> {
     const val project = "2.0.0-SNAPSHOT"
     const val kotlinSparkApiGradlePlugin = "2.0.0-SNAPSHOT"
     const val groupID = "org.jetbrains.kotlinx.spark"
-    const val kotlin = "2.0.0-RC1"
+    const val kotlin = "2.0.0-RC3"
     const val jvmTarget = "8"
     const val jupyterJvmTarget = "8"
     inline val spark get() = System.getProperty("spark") as String
@@ -12,10 +12,10 @@ object Versions : Dsl<Versions> {
     inline val scalaCompat get() = scala.substringBeforeLast('.')
     // TODO
     inline val sparkConnect get() = System.getProperty("sparkConnect", "false").toBoolean()
-    const val jupyter = "0.12.0-32-1"
+    const val jupyter = "0.12.0-163" // latest jupyter version with java 8
 
     const val gradlePublishPlugin = "1.1.0"
-    const val kotest = "5.5.4"
+    const val kotest = "5.9.0"
     const val shadow = "8.1.1"
 
     const val buildconfig = "5.3.5"
@@ -33,7 +33,7 @@ object Versions : Dsl<Versions> {
     const val kotlinxHtml = "0.7.5"
     const val klaxon = "5.5"
     const val jacksonDatabind = "2.13.4.2"
-    const val kotlinxDateTime = "0.6.0-RC.2"
+    const val kotlinxDateTime = "0.6.0"
 
     inline val versionMap: Map<String, String>
         get() = mapOf(

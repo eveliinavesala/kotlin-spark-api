@@ -304,11 +304,19 @@ object KotlinTypeInference : Serializable {
         a + b.mapValues { a.getOrDefault(valueToKey(it.value), it.value) }
 
     private fun registerUdts() {
-        UDTRegistration.register(kotlinx.datetime.LocalDate::class.java.name, LocalDateUdt::class.java.name)
-        UDTRegistration.register(kotlinx.datetime.Instant::class.java.name, InstantUdt::class.java.name)
-        UDTRegistration.register(kotlinx.datetime.LocalDateTime::class.java.name, LocalDateTimeUdt::class.java.name)
-        UDTRegistration.register(kotlinx.datetime.DatePeriod::class.java.name, DatePeriodUdt::class.java.name)
-        UDTRegistration.register(kotlinx.datetime.DateTimePeriod::class.java.name, DateTimePeriodUdt::class.java.name)
+        val udts = listOf(
+            kotlinx.datetime.LocalDate::class to LocalDateUdt::class,
+            kotlinx.datetime.Instant::class to InstantUdt::class,
+            kotlinx.datetime.LocalDateTime::class to LocalDateTimeUdt::class,
+            kotlinx.datetime.DatePeriod::class to DatePeriodUdt::class,
+            kotlinx.datetime.DateTimePeriod::class to DateTimePeriodUdt::class,
+        )
+
+        for ((kClass, udtClass) in udts) {
+            if (!UDTRegistration.exists(kClass.java.name)) {
+                UDTRegistration.register(kClass.java.name, udtClass.java.name)
+            }
+        }
         // TODO
         //  UDTRegistration.register(kotlin.time.Duration::class.java.name, DurationUdt::class.java.name)
     }
