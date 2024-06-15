@@ -4,6 +4,8 @@ object Dependencies : Dsl<Dependencies> {
     inline val scalaLibrary get() = "org.scala-lang:scala-library:${Versions.scala}"
     inline val kotlinxHtml get() = "org.jetbrains.kotlinx:kotlinx-html-jvm:${Versions.kotlinxHtml}"
     inline val sparkSql get() = "org.apache.spark:spark-sql_${Versions.scalaCompat}:${Versions.spark}"
+    inline val sparkSqlApi get() = "org.apache.spark:spark-sql-api_${Versions.scalaCompat}:${Versions.spark}"
+    inline val sparkConnectClient get() = "org.apache.spark:spark-connect-client-jvm_${Versions.scalaCompat}:${Versions.spark}"
     inline val sparkMl get() = "org.apache.spark:spark-mllib_${Versions.scalaCompat}:${Versions.spark}"
     inline val sparkStreaming get() = "org.apache.spark:spark-streaming_${Versions.scalaCompat}:${Versions.spark}"
     inline val hadoopClient get() = "org.apache.hadoop:hadoop-client:${Versions.hadoop}"

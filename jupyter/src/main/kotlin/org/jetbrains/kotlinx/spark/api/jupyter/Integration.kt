@@ -162,10 +162,11 @@ abstract class Integration(private val notebook: Notebook, private val options: 
         }
 
         beforeCellExecution {
-            if (scalaCompatVersion.toDouble() >= 2.13)
+            if (scalaCompatVersion.toDouble() >= 2.13) {
                 execute("scala.`Console\$`.`MODULE\$`.setOutDirect(System.out)")
-            else
+            } else {
                 execute("""scala.Console.setOut(System.out)""")
+            }
 
             beforeCellExecution()
         }

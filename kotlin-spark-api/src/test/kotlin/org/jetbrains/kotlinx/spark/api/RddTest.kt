@@ -1,14 +1,12 @@
 package org.jetbrains.kotlinx.spark.api
 
 import io.kotest.core.spec.style.ShouldSpec
-import io.kotest.core.spec.style.Test
-import io.kotest.core.test.TestScope
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.shouldBe
 import org.apache.spark.api.java.JavaRDD
-import org.jetbrains.kotlinx.spark.api.tuples.*
+import org.jetbrains.kotlinx.spark.api.tuples.X
+import org.jetbrains.kotlinx.spark.api.tuples.t
 import scala.Tuple2
-import java.io.Serializable
 
 class RddTest : ShouldSpec({
     context("RDD extension functions") {

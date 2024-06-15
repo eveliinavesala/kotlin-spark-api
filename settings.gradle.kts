@@ -21,9 +21,11 @@ gradleEnterprise {
 val spark: String by settings
 val scala: String by settings
 val skipScalaOnlyDependent: String by settings
+val sparkConnect: String by settings
 System.setProperty("spark", spark)
 System.setProperty("scala", scala)
 System.setProperty("skipScalaOnlyDependent", skipScalaOnlyDependent)
+System.setProperty("sparkConnect", sparkConnect)
 
 val scalaCompat
     get() = scala.substringBeforeLast('.')
@@ -37,6 +39,7 @@ include("scala-tuples-in-kotlin")
 include("kotlin-spark-api")
 include("jupyter")
 include("examples")
+include("spark-connect-examples")
 include("compiler-plugin")
 include("gradle-plugin")
 
