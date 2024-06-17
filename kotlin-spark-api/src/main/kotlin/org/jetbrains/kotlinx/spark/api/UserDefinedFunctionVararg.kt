@@ -25,7 +25,6 @@ package org.jetbrains.kotlinx.spark.api
 import org.apache.spark.sql.*
 import org.jetbrains.kotlinx.spark.extensions.VarargUnwrapper
 import org.apache.spark.sql.api.java.*
-import org.apache.spark.sql.internal.SQLConf
 import kotlin.reflect.*
 import org.apache.spark.sql.expressions.UserDefinedFunction as SparkUserDefinedFunction
 
@@ -83,15 +82,16 @@ class NamedUserDefinedFunctionVararg<T, R>(
 
 @PublishedApi
 internal inline fun <R> withAllowUntypedScalaUDF(block: () -> R): R {
-    val sqlConf = SQLConf.get()
-    val confString = "spark.sql.legacy.allowUntypedScalaUDF"
-    val prev = sqlConf.getConfString(confString, "false")
-    sqlConf.setConfString(confString, "true")
-    return try {
-        block()
-    } finally {
-        sqlConf.setConfString(confString, prev)
-    }
+//    val sqlConf = SQLConf.get()
+//    val confString = "spark.sql.legacy.allowUntypedScalaUDF"
+//    val prev = sqlConf.getConfString(confString, "false")
+//    sqlConf.setConfString(confString, "true")
+//    return try {
+    return block()
+//    }
+//    finally {
+//        sqlConf.setConfString(confString, prev)
+//    }
 }
 
 

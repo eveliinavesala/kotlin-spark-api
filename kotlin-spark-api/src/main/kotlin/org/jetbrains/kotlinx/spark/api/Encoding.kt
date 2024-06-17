@@ -116,9 +116,9 @@ fun <T> kotlinEncoderFor(kType: KType): Encoder<T> =
  */
 private fun <T> applyEncoder(agnosticEncoder: AgnosticEncoder<T>): Encoder<T> {
     //#if sparkConnect == false
-    return org.apache.spark.sql.catalyst.encoders.ExpressionEncoder.apply(agnosticEncoder)
+    //$return org.apache.spark.sql.catalyst.encoders.ExpressionEncoder.apply(agnosticEncoder)
     //#else
-    //$return agnosticEncoder
+    return agnosticEncoder
     //#endif
 }
 

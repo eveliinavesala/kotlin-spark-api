@@ -17,7 +17,6 @@ plugins {
 group = Versions.groupID
 version = Versions.project
 
-
 repositories {
     mavenCentral()
     mavenLocal()
@@ -33,7 +32,7 @@ dependencies {
     Projects {
         api(
             scalaHelpers,
-            scalaTuplesInKotlin
+            scalaTuplesInKotlin,
         )
     }
 
@@ -42,14 +41,18 @@ dependencies {
         // https://github.com/FasterXML/jackson-bom/issues/52
         if (Versions.spark == "3.3.1") implementation(jacksonDatabind)
 
-        // if (Versions.sparkConnect) TODO("unsupported for now")
+        if (Versions.sparkConnect) {
+            // IMPORTANT!
+            compileOnly(sparkSqlApi)
+            implementation(sparkConnectClient)
+        } else {
+            implementation(sparkSql)
+        }
 
         implementation(
+            hadoopClient,
             kotlinStdLib,
             reflect,
-            sparkSql,
-            sparkStreaming,
-            hadoopClient,
             kotlinDateTime,
         )
 
@@ -68,7 +71,10 @@ dependencies {
 
 // Setup preprocessing with JCP for main sources
 
-val kotlinMainSources = kotlin.sourceSets.main.get().kotlin.sourceDirectories
+val kotlinMainSources =
+    kotlin.sourceSets.main
+        .get()
+        .kotlin.sourceDirectories
 
 val preprocessMain by tasks.creating(JcpTask::class) {
     sources = kotlinMainSources
@@ -107,7 +113,10 @@ tasks.compileKotlin {
 
 // Setup preprocessing with JCP for test sources
 
-val kotlinTestSources = kotlin.sourceSets.test.get().kotlin.sourceDirectories
+val kotlinTestSources =
+    kotlin.sourceSets.test
+        .get()
+        .kotlin.sourceDirectories
 
 val preprocessTest by tasks.creating(JcpTask::class) {
     sources = kotlinTestSources

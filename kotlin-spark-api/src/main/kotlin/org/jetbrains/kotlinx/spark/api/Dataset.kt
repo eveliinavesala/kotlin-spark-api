@@ -29,14 +29,12 @@
 
 package org.jetbrains.kotlinx.spark.api
 
-import org.apache.spark.api.java.JavaRDDLike
 import org.apache.spark.api.java.function.FlatMapFunction
 import org.apache.spark.api.java.function.ForeachFunction
 import org.apache.spark.api.java.function.ForeachPartitionFunction
 import org.apache.spark.api.java.function.MapFunction
 import org.apache.spark.api.java.function.MapPartitionsFunction
 import org.apache.spark.api.java.function.ReduceFunction
-import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.*
 import scala.Tuple2
 import scala.Tuple3
@@ -99,33 +97,6 @@ inline fun <reified T> Array<T>.toDS(spark: SparkSession): Dataset<T> =
  */
 inline fun <reified T> Array<T>.toDF(spark: SparkSession, vararg colNames: String): Dataset<Row> =
     toDS(spark).run { if (colNames.isEmpty()) toDF() else toDF(*colNames) }
-
-/**
- * Utility method to create dataset from RDD
- */
-inline fun <reified T> RDD<T>.toDS(spark: SparkSession): Dataset<T> =
-    spark.createDataset(this, kotlinEncoderFor<T>())
-
-/**
- * Utility method to create dataset from JavaRDD
- */
-inline fun <reified T> JavaRDDLike<T, *>.toDS(spark: SparkSession): Dataset<T> =
-    spark.createDataset(this.rdd(), kotlinEncoderFor<T>())
-
-/**
- * Utility method to create Dataset<Row> (Dataframe) from JavaRDD.
- * NOTE: [T] must be [Serializable].
- */
-inline fun <reified T> JavaRDDLike<T, *>.toDF(spark: SparkSession, vararg colNames: String): Dataset<Row> =
-    toDS(spark).run { if (colNames.isEmpty()) toDF() else toDF(*colNames) }
-
-/**
- * Utility method to create Dataset<Row> (Dataframe) from RDD.
- * NOTE: [T] must be [Serializable].
- */
-inline fun <reified T> RDD<T>.toDF(spark: SparkSession, vararg colNames: String): Dataset<Row> =
-    toDS(spark).run { if (colNames.isEmpty()) toDF() else toDF(*colNames) }
-
 
 /**
  * (Kotlin-specific)
@@ -270,21 +241,6 @@ inline fun <reified T> Dataset<T>.forEach(noinline func: (T) -> Unit): Unit = fo
  */
 inline fun <reified T> Dataset<T>.forEachPartition(noinline func: (Iterator<T>) -> Unit): Unit =
     foreachPartition(ForeachPartitionFunction(func))
-
-/**
- * It's hard to call `Dataset.debugCodegen` from kotlin, so here is utility for that
- */
-fun <T> Dataset<T>.debugCodegen(): Dataset<T> = also {
-    org.apache.spark.sql.execution.debug.`package$`.`MODULE$`.DebugQuery(it).debugCodegen()
-}
-
-/**
- * It's hard to call `Dataset.debug` from kotlin, so here is utility for that
- */
-fun <T> Dataset<T>.debug(): Dataset<T> = also {
-    org.apache.spark.sql.execution.debug.`package$`.`MODULE$`.DebugQuery(it).debug()
-}
-
 
 /**
  * Alias for [Dataset.joinWith] which passes "left" argument

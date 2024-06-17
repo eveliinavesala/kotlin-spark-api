@@ -31,15 +31,19 @@ repositories {
 dependencies {
     Projects {
         implementation(
-            // TODO kotlinSparkApi,
+            kotlinSparkApi,
         )
     }
 
     Dependencies {
 
+//        implementation(hadoopClient)
+
         // IMPORTANT!
         compileOnly(sparkSqlApi)
         implementation(sparkConnectClient)
+
+        implementation(kotlinDateTime)
     }
 }
 
