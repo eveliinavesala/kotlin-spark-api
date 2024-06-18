@@ -76,6 +76,7 @@ import kotlin.reflect.jvm.javaGetter
 import kotlin.reflect.jvm.javaMethod
 import kotlin.reflect.jvm.jvmName
 import kotlin.reflect.typeOf
+import scala.collection.immutable.Seq as ImmutableSeq
 
 fun <T : Any> kotlinEncoderFor(
     kClass: KClass<T>,
@@ -683,7 +684,7 @@ object KotlinTypeInference : Serializable {
 
                 JavaBeanEncoder<Any>(
                     ClassTag.apply(jClass),
-                    fields.asScalaSeq(),
+                    fields.asScalaSeq() as ImmutableSeq<EncoderField>?,
                 )
             }
         }

@@ -21,8 +21,7 @@ repositories {
 dependencies {
 
     Dependencies {
-        api(
-            scalaLibrary,
+        implementation(
             reflect,
         )
 
@@ -32,18 +31,20 @@ dependencies {
         implementation(
 //            sparkSql, not needed atm
         )
+        compileOnly(scalaLibrary)
+        testCompileOnly(scalaLibrary)
     }
 }
 
 java {
     toolchain {
         if (Versions.scalaCompat.toDouble() > 2.12) { // scala 2.12 will always target java 8
-            languageVersion = JavaLanguageVersion.of(Versions.jvmTarget)
-
+            languageVersion = Versions.jvmLanguageVersion
         } else if (Versions.jvmTarget == "1.8" || Versions.jvmTarget == "8") {
             languageVersion = JavaLanguageVersion.of(8)
         }
     }
+    targetCompatibility = JavaVersion.toVersion(Versions.jvmTarget)
 }
 
 tasks.withType<ScalaCompile> {
@@ -54,9 +55,12 @@ tasks.withType<ScalaCompile> {
     }
 }
 
-val scalaMainSources = sourceSets.main.get().scala.sourceDirectories
+val scalaMainSources =
+    sourceSets.main
+        .get()
+        .scala.sourceDirectories
 
-val preprocessMain by tasks.creating(JcpTask::class)  {
+val preprocessMain by tasks.creating(JcpTask::class) {
     sources = scalaMainSources
     clearTarget = true
     fileExtensions = listOf("scala")

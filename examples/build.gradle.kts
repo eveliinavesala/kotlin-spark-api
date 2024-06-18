@@ -1,4 +1,4 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     // Needs to be installed in the local maven repository or have the bootstrap jar on the classpath
@@ -49,8 +49,10 @@ dependencies {
 }
 
 kotlin {
-    jvmToolchain(8)
     jvmToolchain {
-        languageVersion = JavaLanguageVersion.of(Versions.jvmTarget)
+        languageVersion = Versions.jvmLanguageVersion
+    }
+    compilerOptions {
+        jvmTarget = JvmTarget.fromTarget(Versions.jvmTarget)
     }
 }

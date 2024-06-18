@@ -1,5 +1,8 @@
 @file:Suppress("UnstableApiUsage")
 
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
+
 plugins {
     `java-gradle-plugin`
     kotlin
@@ -51,7 +54,10 @@ dependencies {
 
 kotlin {
     jvmToolchain {
-        languageVersion = JavaLanguageVersion.of(Versions.jvmTarget)
+        languageVersion = Versions.jvmLanguageVersion
+    }
+    compilerOptions {
+        jvmTarget = JvmTarget.fromTarget(Versions.jvmTarget)
     }
 }
 

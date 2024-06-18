@@ -5,6 +5,7 @@ plugins {
     id("org.jetbrains.kotlinx.spark.api")
     kotlin("jvm")
     application
+    shadow
 }
 
 // run with `./gradlew run`
@@ -44,21 +45,21 @@ dependencies {
         implementation(sparkConnectClient)
 
         implementation(kotlinDateTime)
+
+        compileOnly(scalaLibrary)
     }
 }
 
-// spark-connect seems to work well with java 17 as client and java 1.8 as server
-// also set gradle and your project sdk to java 17
 kotlin {
     jvmToolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion = JavaLanguageVersion.of(17)//Versions.jvmLanguageVersion
     }
     compilerOptions {
-        jvmTarget = JvmTarget.JVM_17
+        jvmTarget = JvmTarget.fromTarget(Versions.jvmTarget)
     }
 }
 
 tasks.withType<JavaCompile> {
-    sourceCompatibility = JavaVersion.VERSION_17.toString()
-    targetCompatibility = JavaVersion.VERSION_17.toString()
+    sourceCompatibility = JavaVersion.VERSION_1_8.toString()
+    targetCompatibility = JavaVersion.VERSION_1_8.toString()
 }

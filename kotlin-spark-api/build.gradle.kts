@@ -4,6 +4,7 @@ import com.igormaznitsa.jcp.gradle.JcpTask
 import com.vanniktech.maven.publish.JavadocJar.Dokka
 import com.vanniktech.maven.publish.KotlinJvm
 import org.jetbrains.dokka.gradle.AbstractDokkaLeafTask
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     kotlin
@@ -66,6 +67,9 @@ dependencies {
             kafkaStreamsTestUtils,
             sparkMl,
         )
+
+        compileOnly(scalaLibrary)
+        testCompileOnly(scalaLibrary)
     }
 }
 
@@ -154,8 +158,11 @@ tasks.compileTestKotlin {
 }
 
 kotlin {
+    compilerOptions {
+        jvmTarget = JvmTarget.fromTarget(Versions.jvmTarget)
+    }
     jvmToolchain {
-        languageVersion = JavaLanguageVersion.of(Versions.jvmTarget)
+        languageVersion = Versions.jvmLanguageVersion
     }
 }
 

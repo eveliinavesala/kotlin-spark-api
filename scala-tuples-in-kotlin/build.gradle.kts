@@ -3,9 +3,7 @@
 import com.vanniktech.maven.publish.JavadocJar.Dokka
 import com.vanniktech.maven.publish.KotlinJvm
 import org.jetbrains.dokka.gradle.AbstractDokkaLeafTask
-import org.jetbrains.dokka.gradle.DokkaTask
-import org.jetbrains.dokka.gradle.DokkaTaskPartial
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     scala
@@ -30,23 +28,25 @@ dependencies {
     Dependencies {
         implementation(
             kotlinStdLib,
-            scalaLibrary,
         )
         testImplementation(
             kotest,
             atrium,
             kotlinTest,
         )
+        compileOnly(scalaLibrary)
+        testCompileOnly(scalaLibrary)
     }
 }
-
 
 kotlin {
     jvmToolchain {
-        languageVersion = JavaLanguageVersion.of(Versions.jvmTarget)
+        languageVersion = Versions.jvmLanguageVersion
+    }
+    compilerOptions {
+        jvmTarget = JvmTarget.fromTarget(Versions.jvmTarget)
     }
 }
-
 
 tasks.withType<AbstractDokkaLeafTask> {
     dokkaSourceSets {

@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -74,13 +75,17 @@ tasks.withType<KotlinCompile>().configureEach {
 
 kotlin {
     jvmToolchain {
-        languageVersion = JavaLanguageVersion.of(8)
+        languageVersion = Versions.jvmLanguageVersion
+    }
+    compilerOptions {
+        jvmTarget = JvmTarget.fromTarget(Versions.jvmTarget)
     }
 }
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(8)
     }
+    targetCompatibility = JavaVersion.toVersion(Versions.jvmTarget)
 }
 
 val generateTests by tasks.creating(JavaExec::class) {
