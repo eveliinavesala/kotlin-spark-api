@@ -299,6 +299,8 @@ abstract class Integration(protected val notebook: Notebook, private val options
                 "|        ${param.index} -> this.${param.name}"
             }
 
+        println("Sparkified `$name`, this class can be used by Spark in a new cell.")
+
         @Language("kotlin")
         val code =
             """

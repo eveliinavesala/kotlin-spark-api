@@ -200,7 +200,7 @@ class SparkIntegration(notebook: Notebook, options: MutableMap<String, String?>)
                 try {
                     spark!!.addArtifact(it)
                 } catch (e: Exception) {
-                    println("Error while adding artifact $it: $e")
+                    if (properties.debug) println("Error while adding artifact $it: $e")
                 }
             }
 
