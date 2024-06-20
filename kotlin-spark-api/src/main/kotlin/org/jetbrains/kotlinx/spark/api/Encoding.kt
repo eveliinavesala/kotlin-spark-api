@@ -354,6 +354,13 @@ object KotlinTypeInference : Serializable {
                 }.mapKeys { it.key.name }
         ) { it.simpleName }
 
+        //#if sparkConnect == true
+        if (kClass.hasAnnotation<SQLUserDefinedType>() || UDTRegistration.exists(kClass.jvmName)) {
+            println("$kClass has a UDT, but UDTs are not supported with Spark-connect. " +
+                    "Try to encode just primitives/java types or make your own @Sparkify data class.")
+        }
+        //#endif
+
         return when {
             // primitives java / kotlin
             currentType == typeOf<Boolean>() -> AgnosticEncoders.`PrimitiveBooleanEncoder$`.`MODULE$`
@@ -416,7 +423,11 @@ object KotlinTypeInference : Serializable {
             kClass.isSubclassOf(scala.Enumeration.Value::class) ->
                 AgnosticEncoders.ScalaEnumEncoder(jClass.superclass, ClassTag.apply<Any?>(jClass))
 
+            // TODO test kotlin types
+            currentType.isSubtypeOf<kotlinx.datetime.Instant?>() -> AgnosticEncoders.STRICT_INSTANT_ENCODER()
+
             // udts
+            //#if sparkConnect == false
             kClass.hasAnnotation<SQLUserDefinedType>() -> {
                 val annotation = jClass.getAnnotation(SQLUserDefinedType::class.java)!!
                 val udtClass = annotation.udt
@@ -432,8 +443,7 @@ object KotlinTypeInference : Serializable {
 
                 AgnosticEncoders.UDTEncoder(udt, udt.javaClass)
             }
-
-            currentType.isSubtypeOf<kotlin.time.Duration?>() -> TODO("kotlin.time.Duration is unsupported. Use java.time.Duration for now.")
+            //#endif
 
             currentType.isSubtypeOf<scala.Option<*>?>() -> {
                 val elementEncoder = encoderFor(

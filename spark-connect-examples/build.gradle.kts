@@ -38,21 +38,20 @@ dependencies {
 
     Dependencies {
 
-//        implementation(hadoopClient)
-
         // IMPORTANT!
-        compileOnly(sparkSqlApi)
-        implementation(sparkConnectClient)
-
-        implementation(kotlinDateTime)
-
-        compileOnly(scalaLibrary)
+        compileOnly(
+            sparkSqlApi,
+            scalaLibrary,
+        )
+        implementation(
+            sparkConnectClient,
+        )
     }
 }
 
 kotlin {
     jvmToolchain {
-        languageVersion = JavaLanguageVersion.of(17)//Versions.jvmLanguageVersion
+        languageVersion = JavaLanguageVersion.of(17) // Versions.jvmLanguageVersion
     }
     compilerOptions {
         jvmTarget = JvmTarget.fromTarget(Versions.jvmTarget)

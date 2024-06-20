@@ -54,6 +54,8 @@ dependencies {
             hadoopClient,
             kotlinStdLib,
             reflect,
+        )
+        api(
             kotlinDateTime,
         )
 

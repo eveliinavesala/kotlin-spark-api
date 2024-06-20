@@ -377,3 +377,4 @@ orcpath/
 **/.allure/
 **/allure-results/
 /generated_*
+/.kotlin/

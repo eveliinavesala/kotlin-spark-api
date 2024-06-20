@@ -47,16 +47,22 @@ dependencies {
         // https://github.com/FasterXML/jackson-bom/issues/52
         if (Versions.spark == "3.3.1") implementation(jacksonDatabind)
 
+        if (Versions.sparkConnect) {
+            // IMPORTANT!
+            compileOnly(sparkSqlApi)
+            implementation(sparkConnectClient)
+        } else {
+            implementation(sparkSql)
+        }
+
         api(
             kotlinxHtml,
-            sparkSql,
-            sparkRepl,
-            sparkStreaming,
-            hadoopClient,
         )
 
         implementation(
             kotlinStdLib,
+            hadoopClient,
+            reflect
         )
 
         testImplementation(
@@ -65,6 +71,8 @@ dependencies {
             kotlinScriptingJvm,
         )
 
+        compileOnly(scalaLibrary)
+        testCompileOnly(scalaLibrary)
     }
 }
 

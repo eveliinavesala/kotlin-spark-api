@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,11 +19,6 @@
  */
 package org.jetbrains.kotlinx.spark.api.jupyter
 
-import org.apache.spark.api.java.JavaDoubleRDD
-import org.apache.spark.api.java.JavaPairRDD
-import org.apache.spark.api.java.JavaRDD
-import org.apache.spark.api.java.JavaRDDLike
-import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.Dataset
 import org.intellij.lang.annotations.Language
 import org.jetbrains.kotlinx.jupyter.api.Code
@@ -52,16 +47,12 @@ import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.createType
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.isSubtypeOf
-import kotlin.reflect.full.memberFunctions
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.full.primaryConstructor
-import kotlin.reflect.full.valueParameters
 import kotlin.reflect.typeOf
 
-
-abstract class Integration(private val notebook: Notebook, private val options: MutableMap<String, String?>) :
+abstract class Integration(protected val notebook: Notebook, private val options: MutableMap<String, String?>) :
     JupyterIntegration() {
-
     protected val kotlinVersion = /*$"\""+kotlin+"\""$*/ /*-*/ ""
     protected val scalaCompatVersion = /*$"\""+scalaCompat+"\""$*/ /*-*/ ""
     protected val scalaVersion = /*$"\""+scala+"\""$*/ /*-*/ ""
@@ -74,14 +65,14 @@ abstract class Integration(private val notebook: Notebook, private val options: 
             .value
             .getOrThrow() as Properties
 
-
-    protected open val usingProperties = arrayOf(
-        displayLimitName,
-        displayTruncateName,
-        sparkName,
-        scalaName,
-        versionName,
-    )
+    protected open val usingProperties =
+        arrayOf(
+            displayLimitName,
+            displayTruncateName,
+            sparkName,
+            scalaName,
+            versionName,
+        )
 
     /**
      * Will be run after importing all dependencies
@@ -94,47 +85,51 @@ abstract class Integration(private val notebook: Notebook, private val options: 
 
     open fun KotlinKernelHost.beforeCellExecution() = Unit
 
-    open fun KotlinKernelHost.afterCellExecution(snippetInstance: Any, result: FieldValue) = Unit
+    open fun KotlinKernelHost.afterCellExecution(
+        snippetInstance: Any,
+        result: FieldValue,
+    ) = Unit
 
     open fun Builder.onLoadedAlsoDo() = Unit
 
-    open val dependencies: Array<String> = arrayOf(
-        "org.apache.spark:spark-repl_$scalaCompatVersion:$sparkVersion",
-        "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion",
-        "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion",
-        "org.apache.spark:spark-sql_$scalaCompatVersion:$sparkVersion",
-        "org.apache.spark:spark-yarn_$scalaCompatVersion:$sparkVersion",
-        "org.apache.spark:spark-streaming_$scalaCompatVersion:$sparkVersion",
-        "org.apache.spark:spark-mllib_$scalaCompatVersion:$sparkVersion",
-        "org.apache.spark:spark-sql_$scalaCompatVersion:$sparkVersion",
-        "org.apache.spark:spark-graphx_$scalaCompatVersion:$sparkVersion",
-        "org.apache.spark:spark-launcher_$scalaCompatVersion:$sparkVersion",
-        "org.apache.spark:spark-catalyst_$scalaCompatVersion:$sparkVersion",
-        "org.apache.spark:spark-streaming_$scalaCompatVersion:$sparkVersion",
-        "org.apache.spark:spark-core_$scalaCompatVersion:$sparkVersion",
-        "org.scala-lang:scala-library:$scalaVersion",
-        "org.scala-lang.modules:scala-xml_$scalaCompatVersion:2.0.1",
-        "org.scala-lang:scala-reflect:$scalaVersion",
-        "org.scala-lang:scala-compiler:$scalaVersion",
-        "commons-io:commons-io:2.11.0",
-    )
+    open val dependencies: Array<String> =
+        arrayOf(
+            "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion",
+            "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion",
+            "org.apache.spark:spark-sql_$scalaCompatVersion:$sparkVersion",
+            "org.apache.spark:spark-yarn_$scalaCompatVersion:$sparkVersion",
+            "org.apache.spark:spark-streaming_$scalaCompatVersion:$sparkVersion",
+            "org.apache.spark:spark-mllib_$scalaCompatVersion:$sparkVersion",
+            "org.apache.spark:spark-sql_$scalaCompatVersion:$sparkVersion",
+            "org.apache.spark:spark-graphx_$scalaCompatVersion:$sparkVersion",
+            "org.apache.spark:spark-launcher_$scalaCompatVersion:$sparkVersion",
+            "org.apache.spark:spark-catalyst_$scalaCompatVersion:$sparkVersion",
+            "org.apache.spark:spark-streaming_$scalaCompatVersion:$sparkVersion",
+            "org.apache.spark:spark-core_$scalaCompatVersion:$sparkVersion",
+            "org.scala-lang:scala-library:$scalaVersion",
+            "org.scala-lang.modules:scala-xml_$scalaCompatVersion:2.0.1",
+            "org.scala-lang:scala-reflect:$scalaVersion",
+            "org.scala-lang:scala-compiler:$scalaVersion",
+            "commons-io:commons-io:2.11.0",
+        )
 
-    open val imports: Array<String> = arrayOf(
-        "org.jetbrains.kotlinx.spark.api.plugin.annotations.*",
-        "org.jetbrains.kotlinx.spark.api.*",
-        "org.jetbrains.kotlinx.spark.api.tuples.*",
-        *(1..22).map { "scala.Tuple$it" }.toTypedArray(),
-        "org.apache.spark.sql.functions.*",
-        "org.apache.spark.*",
-        "org.apache.spark.sql.*",
-        "org.apache.spark.api.java.*",
-        "scala.collection.Seq",
-        "org.apache.spark.rdd.*",
-        "java.io.Serializable",
-        "org.apache.spark.streaming.api.java.*",
-        "org.apache.spark.streaming.api.*",
-        "org.apache.spark.streaming.*",
-    )
+    open val imports: Array<String> =
+        arrayOf(
+            "org.jetbrains.kotlinx.spark.api.plugin.annotations.*",
+            "org.jetbrains.kotlinx.spark.api.*",
+            "org.jetbrains.kotlinx.spark.api.tuples.*",
+            *(1..22).map { "scala.Tuple$it" }.toTypedArray(),
+            "org.apache.spark.sql.functions.*",
+            "org.apache.spark.*",
+            "org.apache.spark.sql.*",
+            "org.apache.spark.api.java.*",
+            "scala.collection.Seq",
+            "org.apache.spark.rdd.*",
+            "java.io.Serializable",
+            "org.apache.spark.streaming.api.java.*",
+            "org.apache.spark.streaming.api.*",
+            "org.apache.spark.streaming.*",
+        )
 
     // Needs to be set by integration
     var spark: SparkSession? = null
@@ -144,18 +139,18 @@ abstract class Integration(private val notebook: Notebook, private val options: 
         import(*imports)
 
         onLoaded {
-
             val mutableOptions = options.toMutableMap()
 
             declare(
                 VariableDeclaration(
                     name = sparkPropertiesName,
-                    value = object : Properties, MutableMap<String, String?> by mutableOptions {
-                        override fun toString(): String = "Properties: $mutableOptions"
-                    },
+                    value =
+                        object : Properties, MutableMap<String, String?> by mutableOptions {
+                            override fun toString(): String = "Properties: $mutableOptions"
+                        },
                     type = typeOf<Properties>(),
                     isMutable = true,
-                )
+                ),
             )
 
             onLoaded()
@@ -184,11 +179,14 @@ abstract class Integration(private val notebook: Notebook, private val options: 
         }
 
         onClassAnnotation<Sparkify> {
-            for (klass in it) {
-                if (klass.isData) {
-                    execute(generateSparkifyClass(klass))
+            val newClassCode = buildString {
+                for (klass in it) {
+                    if (klass.isData) {
+                        appendLine(generateSparkifyClass(klass))
+                    }
                 }
             }
+            execute(newClassCode)
         }
 
         // Render Dataset
@@ -196,45 +194,57 @@ abstract class Integration(private val notebook: Notebook, private val options: 
             renderDataset(it)
         }
 
+        //#if sparkConnect == false
         // using compile time KType, convert this JavaRDDLike to Dataset and render it
         notebook.renderersProcessor.registerWithoutOptimizing(
-            createRendererByCompileTimeType<JavaRDDLike<*, *>> {
+            createRendererByCompileTimeType<org.apache.spark.api.java.JavaRDDLike<*, *>> {
                 if (spark == null) return@createRendererByCompileTimeType it.value.toString()
 
-                val rdd = (it.value as JavaRDDLike<*, *>).rdd()
-                val type = when {
-                    it.type.isSubtypeOf(typeOf<JavaDoubleRDD>()) ->
-                        typeOf<Double>()
+                val rdd = (it.value as org.apache.spark.api.java.JavaRDDLike<*, *>).rdd()
+                val type =
+                    when {
+                        it.type.isSubtypeOf(typeOf<org.apache.spark.api.java.JavaDoubleRDD>()) ->
+                            typeOf<Double>()
 
-                    it.type.isSubtypeOf(typeOf<JavaPairRDD<*, *>>()) ->
-                        Tuple2::class.createType(
-                            listOf(
-                                it.type.arguments.first(),
-                                it.type.arguments.last(),
+                        it.type.isSubtypeOf(typeOf<org.apache.spark.api.java.JavaPairRDD<*, *>>()) ->
+                            Tuple2::class.createType(
+                                listOf(
+                                    it.type.arguments.first(),
+                                    it.type.arguments.last(),
+                                ),
                             )
-                        )
 
-                    it.type.isSubtypeOf(typeOf<JavaRDD<*>>()) ->
-                        it.type.arguments.first().type!!
+                        it.type.isSubtypeOf(typeOf<org.apache.spark.api.java.JavaRDD<*>>()) ->
+                            it.type.arguments
+                                .first()
+                                .type!!
 
-                    else -> it.type.arguments.first().type!!
-                }
+                        else ->
+                            it.type.arguments
+                                .first()
+                                .type!!
+                    }
                 val ds = spark!!.createDataset(rdd, kotlinEncoderFor(type))
                 renderDataset(ds)
-            }
+            },
         )
-
+        //#endif
+        //#if sparkConnect == false
         // using compile time KType, convert this RDD to Dataset and render it
         notebook.renderersProcessor.registerWithoutOptimizing(
-            createRendererByCompileTimeType<RDD<*>> {
+            createRendererByCompileTimeType<org.apache.spark.rdd.RDD<*>> {
                 if (spark == null) return@createRendererByCompileTimeType it.value.toString()
 
-                val rdd = it.value as RDD<*>
-                val type = it.type.arguments.first().type!!
+                val rdd = it.value as org.apache.spark.rdd.RDD<*>
+                val type =
+                    it.type.arguments
+                        .first()
+                        .type!!
                 val ds = spark!!.createDataset(rdd, kotlinEncoderFor(type))
                 renderDataset(ds)
-            }
+            },
         )
+        //#endif
 
         onLoadedAlsoDo()
     }
@@ -260,7 +270,6 @@ abstract class Integration(private val notebook: Notebook, private val options: 
             textResult("")
         }
 
-
     // TODO wip
     private fun generateSparkifyClass(klass: KClass<*>): Code {
 //        val name = "`${klass.simpleName!!}${'$'}Generated`"
@@ -269,26 +278,30 @@ abstract class Integration(private val notebook: Notebook, private val options: 
         val visibility = klass.visibility?.name?.lowercase() ?: ""
         val memberProperties = klass.memberProperties
 
-        val properties = constructorArgs.associateWith {
-            memberProperties.first { it.name == it.name }
-        }
+        val properties =
+            constructorArgs.associateWith {
+                memberProperties.first { it.name == it.name }
+            }
 
-        val constructorParamsCode = properties.entries.joinToString("\n") { (param, prop) ->
-            // TODO check override
-            if (param.isOptional) TODO()
-            val modifier = if (prop is KMutableProperty<*>) "var" else "val"
-            val paramVisiblity = prop.visibility?.name?.lowercase() ?: ""
-            val columnName = param.findAnnotation<ColumnName>()?.name ?: param.name!!
+        val constructorParamsCode =
+            properties.entries.joinToString("\n") { (param, prop) ->
+                // TODO check override
+                if (param.isOptional) TODO()
+                val modifier = if (prop is KMutableProperty<*>) "var" else "val"
+                val paramVisiblity = prop.visibility?.name?.lowercase() ?: ""
+                val columnName = param.findAnnotation<ColumnName>()?.name ?: param.name!!
 
-            "|     @get:kotlin.jvm.JvmName(\"$columnName\") $paramVisiblity $modifier ${param.name}: ${param.type},"
-        }
+                "|     @get:kotlin.jvm.JvmName(\"$columnName\") $paramVisiblity $modifier ${param.name}: ${param.type},"
+            }
 
-        val productElementWhenParamsCode = properties.entries.joinToString("\n") { (param, _) ->
-            "|        ${param.index} -> this.${param.name}"
-        }
+        val productElementWhenParamsCode =
+            properties.entries.joinToString("\n") { (param, _) ->
+                "|        ${param.index} -> this.${param.name}"
+            }
 
         @Language("kotlin")
-        val code = """
+        val code =
+            """
             |$visibility data class $name(
             $constructorParamsCode
             |): scala.Product, java.io.Serializable {
@@ -299,7 +312,7 @@ abstract class Integration(private val notebook: Notebook, private val options: 
             |        else -> throw IndexOutOfBoundsException()
             |    }
             |}
-        """.trimMargin()
+            """.trimMargin()
         return code
     }
 }

@@ -4,7 +4,7 @@ object Versions : Dsl<Versions> {
     const val project = "2.0.0-SNAPSHOT"
     const val kotlinSparkApiGradlePlugin = "2.0.0-SNAPSHOT"
     const val groupID = "org.jetbrains.kotlinx.spark"
-    const val kotlin = "2.0.0-RC3"
+    const val kotlin = "2.0.0"
     const val jvmTarget = "1.8"
     val jvmLanguageVersion = JavaLanguageVersion.of(8)
     const val jupyterJvmTarget = "8"
