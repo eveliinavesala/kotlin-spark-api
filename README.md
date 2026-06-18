@@ -12,6 +12,14 @@ It allows Kotlin developers to use familiar language features such as data class
 
 We have opened a Spark Project Improvement Proposal: [Kotlin support for Apache Spark](http://issues.apache.org/jira/browse/SPARK-32530) to work with the community towards getting Kotlin support as a first-class citizen in Apache Spark. We encourage you to voice your opinions and participate in the discussion.
 
+## Regarding Spark 4.0.0+ and Spark Connect
+
+While [attempts were made](https://github.com/Kotlin/kotlin-spark-api/issues/195) to bump this library to the next Spark versions,
+this proved to be near impossible using the current library design. In short: a whole rewrite is needed, for which the current maintainers of this project simply don't have the time.
+That's why I'm very happy to say Yerold Sanabria Rios and Eveliina Vesala, for their [Bachelor's thesis](https://www.theseus.fi/handle/10024/926324), decided to research
+what would be the best way to create a Kotlin Spark API in the Spark Connect age. They welcome forks of their [GitHub repo](https://github.com/eveliinavesala/spark-connect-kotlin/tree/main),
+so have a look if you're interested! And maybe together we can continue using Spark in the language we love most <3.
+
 ## Table of Contents
 
 - [Supported versions of Apache Spark](#supported-versions-of-apache-spark)
